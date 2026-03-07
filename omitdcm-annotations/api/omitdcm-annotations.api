@@ -1,0 +1,4 @@
+public abstract interface annotation class com/cakcaraka/omitdcm/annotations/OmitToString : java/lang/annotation/Annotation {
+	public abstract fun redactedClassName ()Ljava/lang/String;
+}
+

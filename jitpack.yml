@@ -1,0 +1,5 @@
+jdk:
+  - openjdk23
+install:
+  - ./gradlew :omitdcm-annotations:publishToMavenLocal :omitdcm-compiler-plugin:publishToMavenLocal -x test
+  - ./gradlew -p omitdcm-gradle-plugin publishToMavenLocal -x test

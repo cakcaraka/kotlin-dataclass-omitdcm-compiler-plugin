@@ -1,0 +1,12 @@
+**/build
+.idea
+.gradle
+.kotlin/
+.iml
+.project
+.classpath
+*.iml
+local.properties
+.DS_Store
+
+docs/
