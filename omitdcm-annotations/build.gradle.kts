@@ -40,27 +40,27 @@ plugins {
  */
 kotlin {
   jvm()
-  js(IR) {
-    compilations.configureEach {
-      compileTaskProvider.configure {
-        compilerOptions {
-          moduleKind.set(MODULE_UMD)
-          sourceMap.set(true)
-        }
-      }
-    }
-    nodejs { testTask { useMocha { timeout = "30s" } } }
-    browser()
-    binaries.executable()
-  }
-
-  @OptIn(ExperimentalWasmDsl::class)
-  wasmJs {
-    binaries.executable()
-    browser {}
-  }
-
-  configureOrCreateNativePlatforms()
+//  js(IR) {
+//    compilations.configureEach {
+//      compileTaskProvider.configure {
+//        compilerOptions {
+//          moduleKind.set(MODULE_UMD)
+//          sourceMap.set(true)
+//        }
+//      }
+//    }
+//    nodejs { testTask { useMocha { timeout = "30s" } } }
+//    browser()
+//    binaries.executable()
+//  }
+//
+//  @OptIn(ExperimentalWasmDsl::class)
+//  wasmJs {
+//    binaries.executable()
+//    browser {}
+//  }
+//
+//  configureOrCreateNativePlatforms()
 }
 
 // Sourced from https://kotlinlang.org/docs/native-target-support.html

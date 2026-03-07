@@ -22,6 +22,8 @@ tasks.withType<JavaCompile>().configureEach {
 
 buildConfig {
   buildConfigField("String", "VERSION", "\"${project.property("VERSION_NAME")}\"")
+  buildConfigField("String", "ANNOTATIONS_GROUP_ID", "\"${project.findProperty("ANNOTATIONS_GROUP_ID")}\"")
+  buildConfigField("String", "COMPILER_PLUGIN_GROUP_ID", "\"${project.findProperty("COMPILER_PLUGIN_GROUP_ID")}\"")
   packageName("com.cakcaraka.omitdcm.gradle")
   useKotlinOutput {
     topLevelConstants = true

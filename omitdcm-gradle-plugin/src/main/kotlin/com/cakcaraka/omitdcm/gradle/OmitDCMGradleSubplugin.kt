@@ -19,7 +19,7 @@ public class OmitDCMGradleSubplugin : KotlinCompilerPluginSupportPlugin {
 
   override fun getPluginArtifact(): SubpluginArtifact =
     SubpluginArtifact(
-      groupId = "com.cakcaraka.omitdcm",
+      groupId = COMPILER_PLUGIN_GROUP_ID,
       artifactId = "omitdcm-compiler-plugin",
       version = VERSION,
     )
@@ -31,23 +31,19 @@ public class OmitDCMGradleSubplugin : KotlinCompilerPluginSupportPlugin {
   ): Provider<List<SubpluginOption>> {
     val project = kotlinCompilation.target.project
     val extension = project.extensions.getByType(OmitDCMPluginExtension::class.java)
-    val omitToStringAnnotations = extension.omitToStringAnnotations
 
-    val useDefaults =
-      omitToStringAnnotations.getOrElse(DEFAULT_OMIT_TO_STRING_ANNOTATION_SET) == DEFAULT_OMIT_TO_STRING_ANNOTATION_SET
-    if (useDefaults) {
-      project.dependencies.add(
-        kotlinCompilation.defaultSourceSet.implementationConfigurationName,
-        "com.cakcaraka.omitdcm:omitdcm-annotations:$VERSION",
-      )
-    }
+    project.dependencies.add(
+      kotlinCompilation.defaultSourceSet.implementationConfigurationName,
+      "$ANNOTATIONS_GROUP_ID:omitdcm-annotations:$VERSION"
+    )
 
     val enabled = extension.enabled.get()
+    val omitToStringPropertyStrategy = extension.omitToStringPropertyStrategy.get()
 
     return project.provider {
       listOf(
         SubpluginOption(key = "enabled", value = enabled.toString()),
-        SubpluginOption(key = "omitToStringAnnotations", value = omitToStringAnnotations.get().joinToString(":")),
+        SubpluginOption(key = "omitToStringPropertyStrategy", value = omitToStringPropertyStrategy),
       )
     }
   }

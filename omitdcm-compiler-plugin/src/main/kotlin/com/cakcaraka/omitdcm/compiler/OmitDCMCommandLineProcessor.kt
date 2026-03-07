@@ -9,11 +9,11 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 
 internal val KEY_ENABLED =
-  CompilerConfigurationKey<Boolean>("Enable/disable OmitToString plugin on the given compilation")
+  CompilerConfigurationKey<Boolean>("Enable/disable OmitDCMToString plugin on the given compilation")
 
-internal val KEY_OMIT_TO_STRING_ANNOTATIONS =
+internal val KEY_OMIT_TO_STRING_PROPERTY_STRATEGY =
   CompilerConfigurationKey<String>(
-    "The OmitToString marker annotations (i.e. com/example/OmitToString) to look for"
+    "Default OmitPropertyStrategy when the annotation does not specify one: REDACT_NAMES, HASH_CODE, or OMIT_ALL"
   )
 
 public class OmitDCMCommandLineProcessor : CommandLineProcessor {
@@ -28,12 +28,12 @@ public class OmitDCMCommandLineProcessor : CommandLineProcessor {
         allowMultipleOccurrences = false,
       )
 
-    val OPTION_OMIT_TO_STRING_ANNOTATIONS =
+    val OPTION_OMIT_TO_STRING_PROPERTY_STRATEGY =
       CliOption(
-        optionName = "omitToStringAnnotations",
-        valueDescription = "String",
-        description = KEY_OMIT_TO_STRING_ANNOTATIONS.toString(),
-        required = true,
+        optionName = "omitToStringPropertyStrategy",
+        valueDescription = "<REDACT_NAMES | HASH_CODE | OMIT_ALL>",
+        description = KEY_OMIT_TO_STRING_PROPERTY_STRATEGY.toString(),
+        required = false,
         allowMultipleOccurrences = false,
       )
   }
@@ -43,7 +43,7 @@ public class OmitDCMCommandLineProcessor : CommandLineProcessor {
   override val pluginOptions: Collection<AbstractCliOption> =
     listOf(
       OPTION_ENABLED,
-      OPTION_OMIT_TO_STRING_ANNOTATIONS,
+      OPTION_OMIT_TO_STRING_PROPERTY_STRATEGY,
     )
 
   override fun processOption(
@@ -53,7 +53,7 @@ public class OmitDCMCommandLineProcessor : CommandLineProcessor {
   ): Unit =
     when (option.optionName) {
       "enabled" -> configuration.put(KEY_ENABLED, value.toBoolean())
-      "omitToStringAnnotations" -> configuration.put(KEY_OMIT_TO_STRING_ANNOTATIONS, value)
+      "omitToStringPropertyStrategy" -> configuration.put(KEY_OMIT_TO_STRING_PROPERTY_STRATEGY, value)
       else -> error("Unknown plugin option: ${option.optionName}")
     }
 }

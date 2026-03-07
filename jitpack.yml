@@ -1,5 +1,7 @@
 jdk:
-  - openjdk23
+  - openjdk21
+# JitPack sets VERSION, GROUP, ARTIFACT. Pass to Gradle so published artifacts and the
+# plugin's default annotations coordinates (group:artifact:version) match.
 install:
-  - ./gradlew :omitdcm-annotations:publishToMavenLocal :omitdcm-compiler-plugin:publishToMavenLocal -x test
-  - ./gradlew -p omitdcm-gradle-plugin publishToMavenLocal -x test
+  - ./gradlew :omitdcm-annotations:publishToMavenLocal :omitdcm-compiler-plugin:publishToMavenLocal -x test -PVERSION_NAME=$VERSION -PRELEASE_SIGNING_ENABLED=false
+  - ./gradlew -p omitdcm-gradle-plugin publishToMavenLocal -x test -PVERSION_NAME=$VERSION -PANNOTATIONS_GROUP_ID=$GROUP.$ARTIFACT -PCOMPILER_PLUGIN_GROUP_ID=$GROUP.$ARTIFACT -PRELEASE_SIGNING_ENABLED=false

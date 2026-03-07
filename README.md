@@ -4,7 +4,11 @@ A Kotlin compiler plugin that omits or modifies the default generated methods of
 
 Currently supported:
 
-- **`@OmitToString`** — Replaces the generated `toString()` with a redacted version that hides all property names and values. The output uses the compile-time class name (meaning if obfuscation like R8/ProGuard is applied, the obfuscated name will be printed) followed by `[OMITTED]` and the object's `hashCode()`.
+- **`@OmitDCMToString`** — Replaces the generated `toString()` with an omitted or redacted version. You can choose how properties appear via `omitPropertyStrategy`:
+  - **`DEFAULT`** (annotation default) — Use the default settings (e.g. Gradle `omitToStringPropertyStrategy`). If not configured, behaves as `HASH_CODE`.
+  - **`HASH_CODE`** — No property names or values; output is `ClassName(hashCode:<hashCode>)`.
+  - **`REDACT_NAMES`** — Property values shown with index as name (e.g. `User(0=Bob, 1=2815551234)`).
+  - **`OMIT_ALL`** — Single `-` in the property area (e.g. `User(-)`).
 
 More method overrides may be added in the future.
 
@@ -12,33 +16,59 @@ Inspired by [ZacSweers/redacted-compiler-plugin](https://github.com/ZacSweers/re
 
 ## Usage
 
-Apply `@OmitToString` to any data class whose `toString()` you want to omit.
+Apply `@OmitDCMToString` to any data class whose `toString()` you want to omit.
 
 ```kotlin
-import com.cakcaraka.omitdcm.annotations.OmitToString
+import com.cakcaraka.omitdcm.annotations.OmitDCMToString
 
-@OmitToString
+@OmitDCMToString
 data class User(val name: String, val phoneNumber: String)
 ```
 
 When you call `toString()`, property values are hidden:
 
 ```
-User[OMITTED](1234567)
+User(hashCode:1234567)
 ```
 
-You can also provide a custom display name:
+You can also provide a custom display name or pick a strategy:
 
 ```kotlin
-@OmitToString("SensitiveUser")
+import com.cakcaraka.omitdcm.annotations.OmitDCMToString
+import com.cakcaraka.omitdcm.annotations.OmitPropertyStrategy
+
+@OmitDCMToString("SensitiveUser")
 data class User(val name: String, val phoneNumber: String)
+
+@OmitDCMToString(omitPropertyStrategy = OmitPropertyStrategy.REDACT_NAMES)
+data class UserRedacted(val name: String, val phone: String)  // UserRedacted(0=Bob, 1=2815551234)
+
+@OmitDCMToString(omitPropertyStrategy = OmitPropertyStrategy.OMIT_ALL)
+data class UserOmitted(val name: String, val phone: String)  // UserOmitted(-)
 ```
 
 ```
-SensitiveUser[OMITTED](1234567)
+SensitiveUser(hashCode:1234567)
 ```
 
-The number in parentheses is the object's `hashCode()`.
+You can put `@OmitDCMToString` on a base class; subclasses inherit the behavior. If the base has a custom display name, that name is used for the subclass too:
+
+```kotlin
+@OmitDCMToString
+abstract class BaseUser
+
+data class Admin(val name: String) : BaseUser()
+
+@OmitDCMToString("Sensitive")
+abstract class BaseSensitive
+
+data class Secret(val id: Int) : BaseSensitive()
+```
+
+```
+Admin(hashCode:1234567)      // no custom name on base → uses class name
+Sensitive(hashCode:1234567)  // custom name on base → subclass uses it
+```
 
 ## Installation
 
@@ -60,11 +90,21 @@ pluginManagement {
 ```gradle
 // build.gradle.kts
 plugins {
-  id("com.cakcaraka.omitdcm") version "<version>"
+  id("com.cakcaraka.omitdcm") version "<version>"  // tag or commit, e.g. 9028b48fb7
 }
 ```
 
-That's it! The default configuration will automatically add the annotations artifact and wire everything up. Just annotate what you want to omit.
+When using **JitPack**, the plugin adds the annotations dependency with groupId `com.cakcaraka.omitdcm`, but JitPack publishes under `com.github.<user>.<repo>`. Set the groupId so it resolves:
+
+```kotlin
+omitdcm {
+  annotationsGroupId.set("com.github.cakcaraka.kotlin-dataclass-omitdcm-compiler-plugin")
+}
+```
+
+Use your actual GitHub user and repo if different. The version is taken from the plugin, so you don't need to set `annotationsVersion`.
+
+Otherwise the default configuration adds the annotations artifact automatically. Just annotate what you want to omit.
 
 ### Configuration
 
@@ -72,11 +112,15 @@ You can configure custom behavior with properties on the `omitdcm` extension.
 
 ```kotlin
 omitdcm {
+  // Default strategy when the annotation uses DEFAULT or has no strategy parameter.
+  // Use exact enum name: "REDACT_NAMES", "HASH_CODE", or "OMIT_ALL".
+  omitToStringPropertyStrategy.set("HASH_CODE")  // Default
+
   // Define custom annotations. The -annotations artifact won't be automatically added to
   // dependencies if you define your own!
   // Note that these must be in the format of a string where packages are delimited by '/' and
   // classes by '.', e.g. "kotlin/Map.Entry"
-  omitToStringAnnotations.add("com/cakcaraka/omitdcm/annotations/OmitToString") // Default
+  omitToStringAnnotations.add("com/cakcaraka/omitdcm/annotations/OmitDCMToString") // Default
 
   // Enable/disable the plugin on this specific compilation.
   enabled = true // Default

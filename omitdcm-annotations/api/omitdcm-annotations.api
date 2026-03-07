@@ -1,4 +1,15 @@
-public abstract interface annotation class com/cakcaraka/omitdcm/annotations/OmitToString : java/lang/annotation/Annotation {
+public abstract interface annotation class com/cakcaraka/omitdcm/annotations/OmitDCMToString : java/lang/annotation/Annotation {
+	public abstract fun omitPropertyStrategy ()Lcom/cakcaraka/omitdcm/annotations/OmitPropertyStrategy;
 	public abstract fun redactedClassName ()Ljava/lang/String;
+}
+
+public final class com/cakcaraka/omitdcm/annotations/OmitPropertyStrategy : java/lang/Enum {
+	public static final field DEFAULT Lcom/cakcaraka/omitdcm/annotations/OmitPropertyStrategy;
+	public static final field HASH_CODE Lcom/cakcaraka/omitdcm/annotations/OmitPropertyStrategy;
+	public static final field OMIT_ALL Lcom/cakcaraka/omitdcm/annotations/OmitPropertyStrategy;
+	public static final field REDACT_NAMES Lcom/cakcaraka/omitdcm/annotations/OmitPropertyStrategy;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/cakcaraka/omitdcm/annotations/OmitPropertyStrategy;
+	public static fun values ()[Lcom/cakcaraka/omitdcm/annotations/OmitPropertyStrategy;
 }
 

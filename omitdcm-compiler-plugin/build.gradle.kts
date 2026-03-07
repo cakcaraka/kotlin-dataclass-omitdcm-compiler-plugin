@@ -36,6 +36,7 @@ val omitdcmRuntimeClasspath =
 
 dependencies {
   compileOnly(libs.kotlin.compiler)
+  implementation(project(":omitdcm-annotations"))
 
   testFixturesApi(libs.kotlin.testJunit5)
   testFixturesApi(libs.kotlin.compilerTestFramework)
